@@ -117,11 +117,17 @@ function createPost(author, content) {
         userId: currentUser.uid
     };
 
+    function playSound() {
+    const audio = new Audio('sound.mp3');
+    audio.play();
+    }
+
     postsRef.push(postData)
         .then(() => {
             showMessage('投稿が完了しました！');
             $('#contentInput').val('');
             updateCharacterCount('contentInput', 'contentCount', 1000);
+             playSound();
         })
         .catch((error) => {
             showMessage('投稿に失敗しました：' + error.message, 'error');
@@ -144,14 +150,32 @@ function escapeHtml(str) {
 
 // タイムスタンプのフォーマット
 function formatTimestamp(timestamp) {
-    const date = new Date(timestamp);
-    return date.toLocaleString('ja-JP', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    const postDate = new Date(timestamp);
+    const now = new Date();
+    const diffMilliseconds = now - postDate;
+    const diffSeconds = Math.floor(diffMilliseconds / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffSeconds < 60) {
+        return '今すぐ';
+    } else if (diffMinutes < 60) {
+        return `${diffMinutes}分前`;
+    } else if (diffHours < 24) {
+        return `${diffHours}時間前`;
+    } else if (diffDays < 7) {
+        return `${diffDays}日前`;
+    } else {
+        // 1週間以上経過した場合は通常の日付フォーマット
+        return postDate.toLocaleString('ja-JP', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
 }
 
 // 投稿の編集権限チェック
