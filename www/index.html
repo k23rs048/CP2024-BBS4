@@ -94,6 +94,9 @@ function validateAuthInput(email, password, isRegister = false) {
         showMessage('パスワードは6文字以上にしてください', 'error');
         return false;
     }
+    if (!nickname || !nickname.trim()) {
+        showMessage('ニックネームを入力してください', 'error');
+        return false;
     return true;
 }
 
